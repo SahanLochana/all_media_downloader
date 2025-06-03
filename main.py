@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-from api.downloadRequestModel import DownloadRequest
+from downloadRequestModel import DownloadRequest
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +20,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Adjust this in production
     allow_credentials=True,
-    allow_methods=["post"],
+    allow_methods=["post", "get"],
     allow_headers=["*"],
 )
 

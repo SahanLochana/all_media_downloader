@@ -33,8 +33,8 @@ RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY')
 def read_root():
     return {"message": "Welcome to the Social Media Downloader API"}
 
-@app.post("/api/download")
-async def download_content(request: DownloadRequest):
+@app.get("/api/download/{url:path}")
+async def download_content(url: str):
     """
     Proxy endpoint for social media download
     """
@@ -45,7 +45,7 @@ async def download_content(request: DownloadRequest):
             "Content-Type": "application/json"
         }
         
-        payload = {"url": request.url}
+        payload = {"url": url}
         
         # You could add caching here to avoid repeated requests for same URL
         
@@ -69,7 +69,6 @@ async def download_content(request: DownloadRequest):
             status_code=500,
             detail=f"Unexpected error: {str(e)}"
         )
-
 # Health check endpoint
 @app.get("/health")
 async def health_check():

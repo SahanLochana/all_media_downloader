@@ -1,0 +1,75 @@
+from fastapi import FastAPI, HTTPException
+import requests
+from fastapi.middleware.cors import CORSMiddleware
+
+from dotenv import load_dotenv
+import os
+
+from api.downloadRequestModel import DownloadRequest
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the variables
+database_url = os.getenv('DATABASE_URL')
+
+app = FastAPI()
+
+# Configure CORS if needed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this in production
+    allow_credentials=True,
+    allow_methods=["post"],
+    allow_headers=["*"],
+)
+
+# Your RapidAPI configuration
+RAPIDAPI_HOST = os.getenv('RAPIDAPI_HOST')
+RAPIDAPI_ENDPOINT = os.getenv('RAPIDAPI_ENDPOINT')
+RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY')
+
+ 
+
+@app.post("/api/download")
+async def download_content(request: DownloadRequest):
+    """
+    Proxy endpoint for social media download
+    """
+    try:
+        headers = {
+            "x-rapidapi-key": RAPIDAPI_KEY,
+            "x-rapidapi-host": RAPIDAPI_HOST,
+            "Content-Type": "application/json"
+        }
+        
+        payload = {"url": request.url}
+        
+        # You could add caching here to avoid repeated requests for same URL
+        
+        response = requests.post(
+            RAPIDAPI_ENDPOINT,
+            json=payload,
+            headers=headers
+        )
+        
+        response.raise_for_status()  # Raise exception for HTTP errors
+        
+        return response.json()
+        
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error communicating with RapidAPI: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error: {str(e)}"
+        )
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+

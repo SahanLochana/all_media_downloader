@@ -29,7 +29,9 @@ RAPIDAPI_HOST = os.getenv('RAPIDAPI_HOST')
 RAPIDAPI_ENDPOINT = os.getenv('RAPIDAPI_ENDPOINT')
 RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY')
 
- 
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Social Media Downloader API"}
 
 @app.post("/api/download")
 async def download_content(request: DownloadRequest):
